@@ -44,9 +44,18 @@ class MessageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Message $message)
+    public function show($id)
     {
-        //
+        $message = Message::find($id);
+
+        if(!$message){
+            return response()->json([
+                'status' => false,
+                'message' => 'Message not found',
+            ], 404);
+        }
+        return response()->json($message);
+        
     }
 
     /**
@@ -62,7 +71,19 @@ class MessageController extends Controller
      */
     public function update(Request $request, Message $message)
     {
-        //
+        $message = Message::find($message->id);
+        if(!$message){
+            return response()->json([
+                'status' => false,
+                'message' => 'Message not found',
+            ], 404);
+        }
+        $message->update($request->all());
+        return response()->json([
+            'status' => true,
+            'message' => 'Message updated successfully',
+            'Message' => $message,
+        ], 200);
     }
 
     /**
@@ -70,6 +91,17 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
-        //
+        $message = Message::find($message->id);
+        if(!$message){
+            return response()->json([
+                'status' => false,
+                'message' => 'Message not found',
+            ], 404);
+        }
+        $message->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'Message deleted successfully',
+        ], 200);
     }
 }

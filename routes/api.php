@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TokenController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\MessageController;
@@ -30,14 +31,51 @@ Route::get('/hello', function() {
     return response()->json(['message' => 'Hello World!']);
 });
 
+//Route for User with token check middleware on /user
 
 Route::middleware(['token.check'])->apiResource('user', UserController::class);
 
-Route::apiResource('universe', UniverseController::class);
+Route::get('/user/{id}', [UserController::class, 'show']);
 
-Route::apiResource('message', MessageController::class);
+Route::put('/user/{id}', [UserController::class, 'update']);
 
-Route::apiResource('character', CharacterController::class);
+Route::delete('/user/{id}', [UserController::class, 'destroy']);
+
+//Route for Universe
+
+Route::middleware(['token.check'])->apiResource('universe', UniverseController::class);
+
+Route::get('/universe/{id}', [UniverseController::class, 'show']);
+
+Route::put('/universe/{id}', [UniverseController::class, 'update']);
+
+Route::delete('/universe/{id}', [UniverseController::class, 'destroy']);
+
+//Route for Message
+
+Route::middleware(['token.check'])->apiResource('message', MessageController::class);
+
+Route::get('/message/{id}', [MessageController::class, 'show']);
+
+Route::put('/message/{id}', [MessageController::class, 'update']);
+
+Route::delete('/message/{id}', [MessageController::class, 'destroy']);
+
+//Route for Character
+
+Route::middleware(['token.check'])->apiResource('character', CharacterController::class);
+
+Route::get('/character/{id}', [CharacterController::class, 'show']);
+
+Route::put('/character/{id}', [CharacterController::class, 'update']);
+
+Route::delete('/character/{id}', [CharacterController::class, 'destroy']);
+
+//Route auth for generate token
+
+Route::post('/auth', [TokenController::class, 'createdToken']);
+
+//Route for header with token
 
 Route::get('/header', function(Request $request) {
     

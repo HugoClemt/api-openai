@@ -53,9 +53,19 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show($id)
     {
-        //
+        //show a user find id
+        $user = User::find($id);
+
+        if(!$user){
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+        return response()->json($user);
+
     }
 
     /**
@@ -71,7 +81,16 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        
+        $data = $request->all();
+
+        if (isset($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        }
+
+        $user->update($data);
+
+        return response()->json($user);
     }
 
     /**
@@ -79,6 +98,17 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user = User::find($user->id);
+        if(!$user){
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+        $user->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'User deleted successfully',
+        ], 200);
     }
 }

@@ -44,9 +44,17 @@ class CharacterController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Character $character)
+    public function show($id)
     {
-        //
+        $character = Character::find($id);
+
+        if(!$character){
+            return response()->json([
+                'status' => false,
+                'message' => 'character not found',
+            ], 404);
+        }
+        return response()->json($character);
     }
 
     /**
@@ -62,7 +70,19 @@ class CharacterController extends Controller
      */
     public function update(Request $request, Character $character)
     {
-        //
+        $character = Character::find($character->id);
+        if(!$character){
+            return response()->json([
+                'status' => false,
+                'message' => 'character not found',
+            ], 404);
+        }
+        $character->update($request->all());
+        return response()->json([
+            'status' => true,
+            'message' => 'character updated successfully',
+            'character' => $character,
+        ], 200);
     }
 
     /**
@@ -70,6 +90,17 @@ class CharacterController extends Controller
      */
     public function destroy(Character $character)
     {
-        //
+        $character = Character::find($character->id);
+        if(!$character){
+            return response()->json([
+                'status' => false,
+                'message' => 'character not found',
+            ], 404);
+        }
+        $character->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'character deleted successfully',
+        ], 200);
     }
 }

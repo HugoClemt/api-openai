@@ -45,9 +45,17 @@ class UniverseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Universe $universe)
+    public function show($id)
     {
-        //
+        $universe = Universe::find($id);
+
+        if(!$universe){
+            return response()->json([
+                'status' => false,
+                'message' => 'universe not found',
+            ], 404);
+        }
+        return response()->json($universe);
     }
 
     /**
@@ -63,7 +71,21 @@ class UniverseController extends Controller
      */
     public function update(Request $request, Universe $universe)
     {
-        //
+        $universe = Universe::find($universe->id);
+        if(!$universe){
+            return response()->json([
+                'status' => false,
+                'message' => 'universe not found',
+            ], 404);
+        }
+
+        $universe->update($request->all());
+
+        return response()->json([
+            'status' => true,
+            'message' => 'universe updated successfully',
+            'universe' => $universe,
+        ], 200);
     }
 
     /**
@@ -71,6 +93,17 @@ class UniverseController extends Controller
      */
     public function destroy(Universe $universe)
     {
-        //
+        $universe = Universe::find($universe->id);
+        if(!$universe){
+            return response()->json([
+                'status' => false,
+                'message' => 'universe not found',
+            ], 404);
+        }
+        $universe->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'universe deleted successfully',
+        ], 200);
     }
 }
