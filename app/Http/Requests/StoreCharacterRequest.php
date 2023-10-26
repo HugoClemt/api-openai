@@ -22,7 +22,6 @@ class StoreCharacterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|integer',
             'name' => 'required|string',
             'description' => 'required|string',
             'image' => 'required|string',

@@ -13,14 +13,15 @@ class TokenController extends Controller
     {
         $login = $request->input('login');
         $password = $request->input('password');
-        $key = config('DB_USERNAME');
+        //$key = Config::get('SECRET_KEY_TOKEN');
+        $key = env('SECRET_KEY_TOKEN');
 
-        return response()->json([
+/*         return response()->json([
             'status' => true,
             'token' => $key,
-        ]);
+        ]); */
 
-        /* $payload = [
+        $payload = [
             'login' => $login,
             'password' => $password,
         ];
@@ -32,7 +33,6 @@ class TokenController extends Controller
             'status' => true,
             'token' => $jwt,
         ])->header('Authorization', $jwt);
-         */
     }
     
 }

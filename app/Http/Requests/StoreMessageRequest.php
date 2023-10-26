@@ -22,11 +22,9 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|integer',
             'description' => 'required|string',  
             'is_human' => 'required|boolean',
-            'id_user' => 'required|integer',
-            'id_character' => 'required|integer',
+            'id_conversation' => 'required|integer',
         ];
     }
 }

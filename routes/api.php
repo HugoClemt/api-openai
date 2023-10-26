@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\TokenController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CharacterController;
@@ -50,6 +51,22 @@ Route::get('/universe/{id}', [UniverseController::class, 'show']);
 Route::put('/universe/{id}', [UniverseController::class, 'update']);
 
 Route::delete('/universe/{id}', [UniverseController::class, 'destroy']);
+
+Route::get('/universe/{id}/character', [UniverseController::class, 'ShowCharacter']);
+
+Route::post('/universe/{id}/character', [UniverseController::class, 'CreateCharacter']);
+
+Route::put('/universe/{id}/character/{id_character}', [UniverseController::class, 'UpdateCharacter']);
+
+Route::delete('/universe/{id}/character/{id_character}', [UniverseController::class, 'DeleteCharacter']);
+
+//Route for Conversation
+
+Route::middleware(['token.check'])->apiResource('conversation', ConversationController::class);
+
+
+
+
 
 //Route for Message
 

@@ -29,7 +29,7 @@ class CaptureHeaders
         }
 
         try {
-            $key = config('SECRET_KEY_TOKEN');
+            $key = env('SECRET_KEY_TOKEN');
             $decoded = JWT::decode($token, new Key($key, 'HS256'));
 
             $request->attributes->set('jwt_data', $decoded);
