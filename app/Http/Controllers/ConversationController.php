@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreConversationRequest;
+use App\Models\Character;
 use App\Models\Conversation;
+use App\Models\Message;
+use App\Models\Universe;
 use Illuminate\Http\Request;
 
 class ConversationController extends Controller
@@ -33,18 +36,77 @@ class ConversationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function CreateMessage($id)
     {
-        //create conversation
-        
+        $conversation = Conversation::find($id);
+
+        if(!$conversation){
+            return response()->json([
+                'status' => false,
+                'message' => 'Conversation not found',
+            ], 404);
+        }
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $message = new Message($data);
+        $message->id_conversation = $conversation->id;
+        $message->save();
+
+        $id = $message->id;
+
+        return response()->json([
+            'status' => true,
+            'conversation' => $message,
+        ]);
     }
     
     /**
      * Display the specified resource.
      */
-    public function show(Conversation $conversation)
+    public function show($id)
     {
-        //show conversato
+        $conversation = Conversation::find($id);
+
+        if(!$conversation){
+            return response()->json([
+                'status' => false,
+                'message' => 'Conversation not found',
+            ], 404);
+        }
+
+        $character = Character::find($conversation->id_character);
+
+        $universe = Universe::find($character->id_universe);
+
+        return response()->json([
+            'status' => true,
+            'conversation' => $conversation,
+            'character' => $character,
+            'universe' => $universe,
+
+        ]);
+    }
+
+    public function ShowMessage($id){
+
+        $conversation = Conversation::find($id);
+
+        if(!$conversation){
+            return response()->json([
+                'status' => false,
+                'message' => 'Conversation not found',
+            ], 404);
+        }
+
+        $message = Message::where('id_conversation', $id)->get();
+
+        return response()->json([
+            'status' => true,
+            'conversation' => $conversation,
+            'message' => $message,
+        ]);
+
     }
 
     /**
@@ -66,8 +128,22 @@ class ConversationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Conversation $conversation)
+    public function destroy($id)
     {
-        //
+        $conversation = Conversation::find($id);
+
+        if(!$conversation){
+            return response()->json([
+                'status' => false,
+                'message' => 'Conversation not found',
+            ], 404);
+        }
+
+        $conversation->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Conversation deleted successfully',
+        ]);
     }
 }

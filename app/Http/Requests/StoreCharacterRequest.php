@@ -24,7 +24,7 @@ class StoreCharacterRequest extends FormRequest
         return [
             'name' => 'required|string',
             'description' => 'required|string',
-            'image' => 'required|string',
+            'image' => 'string',
             'id_universe' => 'required|integer',
         ];
     }

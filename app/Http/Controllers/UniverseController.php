@@ -6,10 +6,21 @@ use App\Http\Requests\StoreCharacterRequest;
 use App\Http\Requests\StoreUniverseRequest;
 use App\Models\Character;
 use App\Models\Universe;
+
 use Illuminate\Http\Request;
+
+use App\Services\OpenAIService;
+use App\Services\StableAIService;
 
 class UniverseController extends Controller
 {
+
+    protected $openAIService;
+
+    public function __construct(OpenAIService $openAIService)
+    {
+        $this->openAIService = $openAIService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -22,8 +33,29 @@ class UniverseController extends Controller
         ]);
     }
 
-    public function store(StoreUniverseRequest $request){
-        $universe = Universe::create($request->all());
+    public function store(StoreUniverseRequest $request, StableAIService $stableAIService)
+    {
+        $data = $request->all();
+        $universeName = $data['name'];
+
+        $promptImage = "Crée une image sur le thèmes ". $data['name']. "L'image doit être dans le style Réalistique ";
+
+        $imagePath = $stableAIService->generateImage($promptImage, $universeName);
+
+        $prompt = "Dans le cadre de ce jeu rôle, génère une description pour l'univers en 256 caractère. L'universe est nommée ". $data['name'];
+ 
+        $text = $this->openAIService->complete($prompt);
+
+        $description = $text['choices'][0]['text'];
+        $description = str_replace("\n", "", $description);
+
+        $universe = new Universe();
+        $universe->name = $data['name'];
+        $universe->id_user = $data['id_user'];
+        $universe->image = $imagePath;
+        $universe->description = $description;
+
+        $universe->save();
 
         return response()->json([
             'status' => true,
@@ -47,22 +79,38 @@ class UniverseController extends Controller
         }
 
         $data = json_decode(file_get_contents("php://input"), true);
+
+        $prompt = "Dans le cadre de ce jeu rôle, génère une description pour le personnage en 256 caractère. Le personnage est nommée ". $data['name'] . " et il est dans l'univers ". $universe->name ;
+
+        $text = $this->openAIService->complete($prompt);
+        $description = $text['choices'][0]['text'];
+        $description = str_replace("\n", "", $description);
         
-
-        //$data = request()->all();
-
-        $character = new Character($data);
+        $character = new Character();
+        $character->name = $data['name'];
         $character->id_universe = $universe->id;
-        $character->save();
+        $character->image = "Image du personnage par stable ";
+        $character->description = $description;
 
-        $id = $character->id;
+        $character->save();
 
         return response()->json([
             'status' => true,
             'message' => 'Personnage ajouté avec succès à l\'univers',
-            'data' => $character->toArray(),
+            'data' => $character,
         ], 201);
     }
+
+    
+
+
+        //$data = request()->all();
+
+        // $character = new Character($data);
+        // $character->id_universe = $universe->id;
+        // $character->save();
+
+        // $id = $character->id;
 
     /**
      * Display the specified resource.

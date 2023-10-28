@@ -64,8 +64,13 @@ Route::delete('/universe/{id}/character/{id_character}', [UniverseController::cl
 
 Route::middleware(['token.check'])->apiResource('conversation', ConversationController::class);
 
+Route::get('/conversation/{id}', [ConversationController::class, 'show']);
 
+Route::delete('/conversation/{id}', [ConversationController::class, 'destroy']);
 
+Route::get('/conversation/{id}/message', [ConversationController::class, 'ShowMessage']);
+
+Route::post('/conversation/{id}/message', [ConversationController::class, 'CreateMessage']);
 
 
 //Route for Message

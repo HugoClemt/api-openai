@@ -9,5 +9,6 @@ class Message extends Model
 {
     use HasFactory;
     protected $table = 'message';
-    protected $fillable = ['id', 'description', 'is_human', 'id_conversation'];
+    protected $primaryKey = 'id';
+    protected $fillable = ['text', 'is_human', 'id_conversation'];
 }

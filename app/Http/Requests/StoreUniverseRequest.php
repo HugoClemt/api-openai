@@ -23,8 +23,8 @@ class StoreUniverseRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'description' => 'required|string',
-            'image' => 'required|string',
+            'description' => 'string',
+            'image' => 'string',
             'id_user' => 'required|integer',
             
         ];

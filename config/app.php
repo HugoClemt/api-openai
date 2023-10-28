@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'env' => env('APP_ENV', 'production'),
+    'env' => env('APP_ENV', 'local'),
 
     /*
     |--------------------------------------------------------------------------
@@ -110,9 +110,6 @@ return [
     */
 
     'faker_locale' => 'en_US',
-
-    //accessing the .env file variable SECRET_KEY_TOKEN
-    'SECRET_KEY_TOKEN'=> env('SECRET_KEY_TOKEN'),
 
     /*
     |--------------------------------------------------------------------------
