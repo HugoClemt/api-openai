@@ -9,5 +9,6 @@ class Universe extends Model
 {
     /* use HasFactory; */
     protected $table = 'universe';
-    protected $fillable = ['id', 'name', 'description', 'image', 'id_user'];
+    protected $primaryKey = 'id';
+    protected $fillable = ['name', 'description', 'image', 'id_user'];
 }
