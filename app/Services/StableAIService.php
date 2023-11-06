@@ -45,7 +45,7 @@ class StableAIService
         // verify peer false
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-        // Execute the request
+        // Execute the requestc 
         $result = curl_exec($ch);
 
         // Close the request
