@@ -7,10 +7,18 @@ use App\Models\Character;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\Universe;
+use App\Services\OpenAIService;
 use Illuminate\Http\Request;
+use Laravel\Prompts\Prompt;
 
 class ConversationController extends Controller
 {
+    protected $openAIService;
+
+    public function __construct(OpenAIService $openAIService)
+    {
+        $this->openAIService = $openAIService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -40,6 +48,9 @@ class ConversationController extends Controller
     {
         $conversation = Conversation::find($id);
 
+        $character = Character::find($conversation->id_character);
+
+
         if(!$conversation){
             return response()->json([
                 'status' => false,
@@ -49,15 +60,36 @@ class ConversationController extends Controller
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        $message = new Message($data);
-        $message->id_conversation = $conversation->id;
-        $message->save();
+        $isHuman = isset($data['is_human']) ? $data['is_human'] : 1;
 
-        $id = $message->id;
+        $promptMesage = "Portray the character ".$character->name." to respond to the previous message: ".$data['text'].". The response should be in French.";
+
+        $result = $this->openAIService->complete($promptMesage);
+
+        $textOpen = $result['choices'][0]['text'];
+        $textOpen = str_replace("\n", "", $textOpen);
+        
+        $userMessage = new Message([
+            'text' => $data['text'],
+            'is_human' => $isHuman,
+        ]);
+        $userMessage->id_conversation = $conversation->id;
+        $userMessage->save();
+
+        $aiMessage = new Message([
+            'text' => $textOpen,
+            'is_human' => 0,
+        ]);
+        $aiMessage->id_conversation = $conversation->id;
+        $aiMessage->save();
+
+        $userId = $userMessage->id;
+        $aiMessageId = $aiMessage->id;
 
         return response()->json([
             'status' => true,
-            'conversation' => $message,
+            'message user' => $userMessage,
+            'message ai' => $aiMessage,
         ]);
     }
     
@@ -99,7 +131,7 @@ class ConversationController extends Controller
             ], 404);
         }
 
-        $message = Message::where('id_conversation', $id)->get();
+        $message = Message::where('id_conversation', $id)->orderBy('id', 'asc')->get();
 
         return response()->json([
             'status' => true,

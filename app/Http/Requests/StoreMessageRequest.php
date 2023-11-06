@@ -23,7 +23,7 @@ class StoreMessageRequest extends FormRequest
     {
         return [
             'text' => 'required|string',  
-            'is_human' => 'required|boolean',
+            'is_human' => 'boolean',
             'id_conversation' => 'required|integer',
         ];
     }

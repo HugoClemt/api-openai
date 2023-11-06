@@ -16,7 +16,7 @@ class TokenController extends Controller
         //$key = Config::get('SECRET_KEY_TOKEN');
         $key = env('SECRET_KEY_TOKEN');
 
-/*         return response()->json([
+        /* return response()->json([
             'status' => true,
             'token' => $key,
         ]); */

@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMessageRequest;
 use App\Models\Message;
+use App\Services\OpenAIService;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
+
+    protected $openAIService;
+
+    public function __construct(OpenAIService $openAIService)
+    {
+        $this->openAIService = $openAIService;
+    }
     /**
      * Display a listing of the resource.
      */

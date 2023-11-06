@@ -17,9 +17,10 @@ class UniverseController extends Controller
 
     protected $openAIService;
 
-    public function __construct(OpenAIService $openAIService)
+    public function __construct(OpenAIService $openAIService, StableAIService $stableAIService)
     {
         $this->openAIService = $openAIService;
+        $this->stableAIService = $stableAIService;
     }
     /**
      * Display a listing of the resource.
@@ -38,7 +39,7 @@ class UniverseController extends Controller
         $data = $request->all();
         $universeName = $data['name'];
 
-        $promptImage = "Crée une image sur le thèmes ". $data['name']. "L'image doit être dans le style Réalistique ";
+        $promptImage = "Generate a high-quality realistic image of the universe related to ". $data['name'];
 
         $imagePath = $stableAIService->generateImage($promptImage, $universeName);
 
@@ -67,7 +68,7 @@ class UniverseController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function CreateCharacter($id)
+    public function CreateCharacter($id, StableAIService $stableAIService)
     {
         $universe = Universe::find($id);
 
@@ -80,6 +81,10 @@ class UniverseController extends Controller
 
         $data = json_decode(file_get_contents("php://input"), true);
 
+        $promptImage = "Generate a high-quality realistic image of the character ". $data['name'] ." related to ". $universe->name;
+
+        $imagePath = $stableAIService->generateImage($promptImage, $data['name']);
+
         $prompt = "Dans le cadre de ce jeu rôle, génère une description pour le personnage en 256 caractère. Le personnage est nommée ". $data['name'] . " et il est dans l'univers ". $universe->name ;
 
         $text = $this->openAIService->complete($prompt);
@@ -89,7 +94,7 @@ class UniverseController extends Controller
         $character = new Character();
         $character->name = $data['name'];
         $character->id_universe = $universe->id;
-        $character->image = "Image du personnage par stable ";
+        $character->image = $imagePath;
         $character->description = $description;
 
         $character->save();
@@ -100,17 +105,6 @@ class UniverseController extends Controller
             'data' => $character,
         ], 201);
     }
-
-    
-
-
-        //$data = request()->all();
-
-        // $character = new Character($data);
-        // $character->id_universe = $universe->id;
-        // $character->save();
-
-        // $id = $character->id;
 
     /**
      * Display the specified resource.

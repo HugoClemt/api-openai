@@ -5,7 +5,7 @@ namespace App\Services;
 class StableAIService
 {
     protected $apiKey;
-    protected $imagePath = 'storage/app/public';
+    protected $imagePath = 'storage/app/public/image';
     
 
     public function __construct()
@@ -51,9 +51,13 @@ class StableAIService
         // Close the request
         curl_close($ch);
 
-        $imagePath = $this->imagePath . '/' . $imageName;
+        $imagePath = public_path('image/' . $imageName);
 
-        file_put_contents($imageName, $result);
+        if (!file_exists(public_path('image'))) {
+            mkdir(public_path('image'), 0755, true);
+        }
+
+        file_put_contents($imagePath, $result);
 
         return $imagePath;
     }
