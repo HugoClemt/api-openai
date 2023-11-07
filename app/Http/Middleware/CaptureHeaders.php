@@ -2,21 +2,21 @@
 
 namespace App\Http\Middleware;
 
+use App\Contracts\TokenManagerInterface;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-use Illuminate\Support\Facades\Config;
 
 
 class CaptureHeaders
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
+    protected $tokenManager;
+
+    public function __construct(TokenManagerInterface $tokenManager)
+    {
+        $this->tokenManager = $tokenManager;
+    }
+
     public function handle(Request $request, Closure $next): Response
     {
         $token = $request->header('Authorization');
@@ -28,17 +28,16 @@ class CaptureHeaders
             ], 401);
         }
 
-        try {
-            $key = env('SECRET_KEY_TOKEN');
-            $decoded = JWT::decode($token, new Key($key, 'HS256'));
+        $decoded = $this->tokenManager->checkToken($token);
 
-            $request->attributes->set('jwt_data', $decoded);
-        } catch (\Exception $e) {
+        if ($decoded === null) {
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized',
             ], 401);
         }
+
+        $request->attributes->set('jwt_data', $decoded);
 
         return $next($request);
     }

@@ -16,6 +16,21 @@ class JWTTokenManager implements TokenManagerInterface
 
         return $jwt;
     }
+
+    public function checkToken(string $token)
+    {
+        try {
+            $key = env('SECRET_KEY_TOKEN');
+            
+            $keyTTT = new Key($key, 'HS256');
+
+            $decoded = JWT::decode($token, $keyTTT);
+            return $decoded;
+        } catch (\Exception $e) {
+            
+            return null;
+        }
+    }
 }
 
 ?>

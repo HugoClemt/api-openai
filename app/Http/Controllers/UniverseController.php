@@ -7,6 +7,8 @@ use App\Http\Requests\StoreUniverseRequest;
 use App\Models\Character;
 use App\Models\Universe;
 
+
+use App\Services\CharacterFacade;
 use App\Services\UniverseFacade;
 use Illuminate\Http\Request;
 
@@ -43,42 +45,12 @@ class UniverseController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function CreateCharacter($id, StableAIService $stableAIService)
+    public function createCharacter($universeId, Request $request, CharacterFacade $characterFacade)
     {
-        $universe = Universe::find($id);
+        $data = $request->all();
+        $response = $characterFacade->createCharacter($universeId, $data);
 
-        if (!$universe) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Univers non trouvé',
-            ], 404);
-        }
-
-        $data = json_decode(file_get_contents("php://input"), true);
-
-        $promptImage = "Generate a high-quality realistic image of the character " . $data['name'] . " related to " . $universe->name;
-
-        $imagePath = $stableAIService->generateImage($promptImage, $data['name']);
-
-        $prompt = "Dans le cadre de ce jeu rôle, génère une description pour le personnage en 256 caractère. Le personnage est nommée " . $data['name'] . " et il est dans l'univers " . $universe->name;
-
-        $text = $this->openAIService->complete($prompt);
-        $description = $text['choices'][0]['text'];
-        $description = str_replace("\n", "", $description);
-
-        $character = new Character();
-        $character->name = $data['name'];
-        $character->id_universe = $universe->id;
-        $character->image = $imagePath;
-        $character->description = $description;
-
-        $character->save();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Personnage ajouté avec succès à l\'univers',
-            'data' => $character,
-        ], 201);
+        return $response;
     }
 
     /**
