@@ -39,7 +39,7 @@ class UniverseController extends Controller
         $data = $request->all();
         $universeName = $data['name'];
 
-        $promptImage = "Generate a high-quality realistic image of the universe related to ". $data['name'];
+        $promptImage = "Generate an ultra-realistic image that faithfully captures the iconic characters, settings, and elements of ". $data['name'].", ensuring it reflects the true essence of the ". $data['name']." universe. Pay meticulous attention to details, textures, and lighting to make it look like a photograph from within the ". $data['name']." world.";
 
         $imagePath = $stableAIService->generateImage($promptImage, $universeName);
 
@@ -47,8 +47,12 @@ class UniverseController extends Controller
  
         $text = $this->openAIService->complete($prompt);
 
-        $description = $text['choices'][0]['text'];
-        $description = str_replace("\n", "", $description);
+        if (isset($text['choices']) && is_array($text['choices']) && count($text['choices']) > 0) {
+            $description = $text['choices'][0]['text'];
+            $description = str_replace("\n", "", $description);
+        } else {
+            $description = "Description non disponible";
+        }
 
         $universe = new Universe();
         $universe->name = $data['name'];
