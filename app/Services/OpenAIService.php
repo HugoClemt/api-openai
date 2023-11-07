@@ -28,7 +28,7 @@ class OpenAIService
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
         $request = array(
-            "model" => "gpt-3.5-turbo-instuct",
+            "model" => "gpt-3.5-turbo-instruct",
             "temperature" => 1,
             "max_tokens" => 256,
             "top_p" => 1,

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreUniverseRequest;
 use App\Models\Character;
 use App\Models\Universe;
 
+use App\Services\UniverseFacade;
 use Illuminate\Http\Request;
 
 use App\Services\OpenAIService;
@@ -34,39 +35,9 @@ class UniverseController extends Controller
         ]);
     }
 
-    public function store(StoreUniverseRequest $request, StableAIService $stableAIService)
+    public function store(StoreUniverseRequest $request, UniverseFacade $universeFacade)
     {
-        $data = $request->all();
-        $universeName = $data['name'];
-
-        $promptImage = "Generate an ultra-realistic image that faithfully captures the iconic characters, settings, and elements of ". $data['name'].", ensuring it reflects the true essence of the ". $data['name']." universe. Pay meticulous attention to details, textures, and lighting to make it look like a photograph from within the ". $data['name']." world.";
-
-        $imagePath = $stableAIService->generateImage($promptImage, $universeName);
-
-        $prompt = "Dans le cadre de ce jeu rôle, génère une description pour l'univers en 256 caractère. L'universe est nommée ". $data['name'];
- 
-        $text = $this->openAIService->complete($prompt);
-
-        if (isset($text['choices']) && is_array($text['choices']) && count($text['choices']) > 0) {
-            $description = $text['choices'][0]['text'];
-            $description = str_replace("\n", "", $description);
-        } else {
-            $description = "Description non disponible";
-        }
-
-        $universe = new Universe();
-        $universe->name = $data['name'];
-        $universe->id_user = $data['id_user'];
-        $universe->image = $imagePath;
-        $universe->description = $description;
-
-        $universe->save();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'universe created successfully',
-            'universe' => $universe,
-        ], 200);
+        return $universeFacade->createUniverse($request);
     }
 
     /**
@@ -85,16 +56,16 @@ class UniverseController extends Controller
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        $promptImage = "Generate a high-quality realistic image of the character ". $data['name'] ." related to ". $universe->name;
+        $promptImage = "Generate a high-quality realistic image of the character " . $data['name'] . " related to " . $universe->name;
 
         $imagePath = $stableAIService->generateImage($promptImage, $data['name']);
 
-        $prompt = "Dans le cadre de ce jeu rôle, génère une description pour le personnage en 256 caractère. Le personnage est nommée ". $data['name'] . " et il est dans l'univers ". $universe->name ;
+        $prompt = "Dans le cadre de ce jeu rôle, génère une description pour le personnage en 256 caractère. Le personnage est nommée " . $data['name'] . " et il est dans l'univers " . $universe->name;
 
         $text = $this->openAIService->complete($prompt);
         $description = $text['choices'][0]['text'];
         $description = str_replace("\n", "", $description);
-        
+
         $character = new Character();
         $character->name = $data['name'];
         $character->id_universe = $universe->id;
@@ -117,7 +88,7 @@ class UniverseController extends Controller
     {
         $universe = Universe::find($id);
 
-        if(!$universe){
+        if (!$universe) {
             return response()->json([
                 'status' => false,
                 'message' => 'universe not found',
@@ -142,16 +113,17 @@ class UniverseController extends Controller
         return response()->json([
             'status' => true,
             'universe' => $universe->name,
-            'characters' => $characters, 
+            'characters' => $characters,
         ]);
     }
 
     //function for update character width id on url and universe id on url 
-    public function UpdateCharacter($id, $id_character, Request $request){
+    public function UpdateCharacter($id, $id_character, Request $request)
+    {
 
         $universe = Universe::find($id);
 
-        if(!$universe){
+        if (!$universe) {
             return response()->json([
                 'status' => false,
                 'message' => 'universe not found',
@@ -160,7 +132,7 @@ class UniverseController extends Controller
 
         $character = Character::find($id_character);
 
-        if(!$character){
+        if (!$character) {
             return response()->json([
                 'status' => false,
                 'message' => 'character not found',
@@ -178,10 +150,10 @@ class UniverseController extends Controller
 
         return response()->json([
             'status' => true,
-            'data universe' => $universe->name, 
+            'data universe' => $universe->name,
             'datat charachter' => $character
         ], 200);
-        
+
     }
 
     /**
@@ -190,7 +162,7 @@ class UniverseController extends Controller
     public function update(Request $request, Universe $universe)
     {
         $universe = Universe::find($universe->id);
-        if(!$universe){
+        if (!$universe) {
             return response()->json([
                 'status' => false,
                 'message' => 'universe not found',
@@ -212,7 +184,7 @@ class UniverseController extends Controller
     public function destroy(Universe $universe)
     {
         $universe = Universe::find($universe->id);
-        if(!$universe){
+        if (!$universe) {
             return response()->json([
                 'status' => false,
                 'message' => 'universe not found',
@@ -225,11 +197,12 @@ class UniverseController extends Controller
         ], 200);
     }
 
-    public function DeleteCharacter($id, $id_character){
-        
+    public function DeleteCharacter($id, $id_character)
+    {
+
         $universe = Universe::find($id);
 
-        if(!$universe){
+        if (!$universe) {
             return response()->json([
                 'status' => false,
                 'message' => 'universe not found',
@@ -238,7 +211,7 @@ class UniverseController extends Controller
 
         $character = Character::find($id_character);
 
-        if(!$character){
+        if (!$character) {
             return response()->json([
                 'status' => false,
                 'message' => 'character not found',
