@@ -6,12 +6,21 @@ class StableAIService
 {
     protected $apiKey;
     protected $imagePath = 'storage/app/public/image';
+    private static $instance = null;
 
 
     public function __construct()
     {
         $this->apiKey = env('STABLE_API_KEY');
 
+    }
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 
     function generateImage(string $promptImage, string $name)

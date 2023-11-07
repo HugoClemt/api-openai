@@ -19,7 +19,7 @@ class UniverseFacade
 
     public function createUniverse(StoreUniverseRequest $request)
     {
-        $stableAIService = app(StableAIService::class);
+        $stableAIService = StableAIService::getInstance();
 
         $data = $request->all();
         $universeName = $data['name'];
