@@ -50,7 +50,7 @@ class CharacterFacade
         $character->id_universe = $universe->id;
         $character->image = $imagePath;
         $character->description = $description;
-        // $character->save();
+        $character->save();
 
         return response()->json([
             'status' => true,
