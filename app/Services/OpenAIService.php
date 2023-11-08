@@ -5,6 +5,7 @@ namespace App\Services;
 class OpenAIService
 {
     protected $apiKey;
+    protected $timeout = 5;
 
     public function __construct()
     {
@@ -23,6 +24,8 @@ class OpenAIService
             "Content-Type: application/json"
         )
         );
+
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
 
         // verify peer false
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
